@@ -1,21 +1,12 @@
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
+  inset: 0;
+  background: rgba(0, 0, 0, .7);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   padding: 20px;
-  animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
 
 .modal-content {
@@ -26,80 +17,44 @@
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
-  animation: slideUp 0.3s ease;
 }
 
 body.dark-mode .modal-content { background: #1a1a2e; }
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.modal-close {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: #f0f4ff;
-  border: none;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #4a5568;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  z-index: 2;
-}
-
-body.dark-mode .modal-close { background: #2a2a3e; color: #b0b8c8; }
+.modal-close { position: absolute; top: 15px; right: 15px; z-index: 2; background: #f0f4ff; border: 0; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #4a5568; cursor: pointer; }
 .modal-close:hover { background: #4a90e2; color: white; }
-
-.modal-header {
-  padding: 30px 30px 20px;
-  border-bottom: 1px solid #e0e0e0;
-}
-
+.modal-header { padding: 30px 30px 20px; border-bottom: 1px solid #e0e0e0; }
 body.dark-mode .modal-header { border-color: #2a2a3e; }
-.modal-number { background: #4a90e2; color: white; padding: 4px 12px; border-radius: 12px; font-size: .85rem; font-weight: 600; display: inline-block; margin-bottom: 12px; }
-.modal-header h2 { font-size: 1.4rem; font-weight: 600; color: #1a1a2e; line-height: 1.4; }
+.modal-number { display: inline-block; background: #4a90e2; color: white; padding: 4px 12px; border-radius: 12px; font-size: .85rem; font-weight: 600; margin-bottom: 12px; }
+.modal-header h2 { color: #1a1a2e; font-size: 1.4rem; line-height: 1.4; }
 body.dark-mode .modal-header h2 { color: #e8e9ea; }
 .modal-body { padding: 30px; }
 
-.prompt-box {
-  background: #f8f9fa;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 25px;
-  overflow: hidden;
-}
+.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
+.info-item { background: #f0f4ff; padding: 15px; border-radius: 8px; text-align: center; min-width: 0; }
+body.dark-mode .info-item { background: #2a2a3e; }
+.info-label { display: block; color: #718096; font-size: .85rem; line-height: 1.4; margin-bottom: 8px; }
+.info-value { display: block; color: #1a1a2e; font-size: 1rem; font-weight: 600; line-height: 1.4; overflow-wrap: anywhere; }
+body.dark-mode .info-value { color: #e8e9ea; }
+.info-value.earnings { color: #48bb78; }
+.info-value.difficulty { color: #ed8936; }
 
+.info-section { margin-bottom: 25px; }
+.info-section h3 { color: #1a1a2e; font-size: 1.1rem; margin-bottom: 12px; }
+body.dark-mode .info-section h3 { color: #e8e9ea; }
+.skills-list { display: flex; gap: 8px; flex-wrap: wrap; }
+.skill-badge-modal { background: #4a90e2; color: white; padding: 6px 12px; border-radius: 6px; font-size: .85rem; font-weight: 500; }
+
+.prompt-box { background: #f8f9fa; border: 2px solid #e0e0e0; border-radius: 8px; padding: 20px; margin-bottom: 25px; overflow: hidden; }
 body.dark-mode .prompt-box { background: #0f0f1a; border-color: #2a2a3e; }
 .prompt-box-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; }
-.prompt-box-header span { font-weight: 600; color: #4a5568; font-size: .9rem; }
+.prompt-box-header span { color: #4a5568; font-size: .9rem; font-weight: 600; }
 body.dark-mode .prompt-box-header span { color: #b0b8c8; }
-.copy-prompt-btn { display: flex; align-items: center; gap: 6px; background: #4a90e2; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: .85rem; font-weight: 500; cursor: pointer; }
+.copy-prompt-btn { display: flex; align-items: center; gap: 6px; background: #4a90e2; color: white; border: 0; padding: 6px 12px; border-radius: 6px; font-size: .85rem; font-weight: 500; cursor: pointer; }
 .copy-prompt-btn:hover { background: #357abd; }
-
-.prompt-text {
-  display: block;
-  width: 100%;
-  margin: 0;
-  color: #1a1a2e;
-  line-height: 1.7;
-  font-size: 1rem;
-  font-family: inherit;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-  max-height: none;
-  overflow: visible;
-}
-
+.prompt-text { display: block; width: 100%; margin: 0; color: #1a1a2e; line-height: 1.7; font-size: 1rem; font-family: inherit; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }
 body.dark-mode .prompt-text { color: #e8e9ea; }
+.back-btn { display: inline-flex; align-items: center; gap: 8px; background: #4a90e2; color: white; border: 0; padding: 12px 20px; border-radius: 6px; font-weight: 500; cursor: pointer; }
+.back-btn:hover { background: #357abd; }
 
 @media (max-width: 768px) {
   .modal-content { max-height: 95vh; }
