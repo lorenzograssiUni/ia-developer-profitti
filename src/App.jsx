@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Papa from 'papaparse'
 import Header from './components/Header'
 import Hero from './components/Hero'
@@ -9,6 +9,8 @@ import PromptModal from './components/PromptModal'
 import LearningPath from './components/LearningPath'
 import FAQ from './components/FAQ'
 import './styles/App.css'
+
+const pick = (row, ...keys) => keys.map(key => row[key]).find(value => value?.trim?.()) || ''
 
 function App() {
   const [prompts, setPrompts] = useState([])
@@ -27,45 +29,59 @@ function App() {
   }, [])
 
   useEffect(() => {
-    localStorage.setItem('darkMode', darkMode)
+    localStorage.setItem('darkMode', String(darkMode))
     document.body.classList.toggle('dark-mode', darkMode)
   }, [darkMode])
 
   useEffect(() => {
     fetch('/data/prompts.csv')
       .then(response => {
-        if (!response.ok) throw new Error('Il file dei prompt non è disponibile.')
+        if (!response.ok) throw new Error('File CSV non disponibile')
         return response.text()
       })
-      .then(csvText => {
-        const result = Papa.parse(csvText, { header: true, skipEmptyLines: true })
-        const data = result.data.filter(row => row['#'] && row.Prompt)
-        if (!data.length) throw new Error('Il file non contiene prompt validi.')
-        setPrompts(data)
+      .then(text => {
+        const parsed = Papa.parse(text, { header: true, skipEmptyLines: true })
+        const normalized = parsed.data.map(row => ({
+          id: pick(row, '#', 'Numero', 'ID'),
+          title: pick(row, 'Titolo', 'Prompt'),
+          difficulty: pick(row, 'Difficoltà°°', 'Difficoltà', 'Difficolta'),
+          skills: pick(row, 'Skill richieste', 'Skill'),
+          earnings: pick(row, 'Guadagno mensile', 'Guadagno'),
+          time: pick(row, 'Tempo', 'Tempo stimato'),
+          type: pick(row, 'Tipo attività', 'Tipo attivita', 'Tipo'),
+          effectivePrompt: pick(row, 'Prompt Effettivo', 'Prompt effettivo', 'Prompt'),
+          raw: row
+        })).filter(item => item.id && item.title)
+        if (!normalized.length) throw new Error('Nessun prompt valido nel CSV')
+        setPrompts(normalized)
       })
       .catch(error => {
-        console.error('Errore caricamento CSV:', error)
-        setLoadError('Non siamo riusciti a caricare i prompt. Ricarica la pagina tra qualche istante.')
+        console.error(error)
+        setLoadError('Non siamo riusciti a caricare i prompt. Riprova tra qualche istante.')
       })
       .finally(() => setLoading(false))
   }, [])
 
-  const filteredPrompts = prompts.filter(prompt => {
-    const text = `${prompt.Prompt || ''} ${prompt['Perché fa per te'] || ''}`.toLowerCase()
-    const matchesSearch = !searchTerm || text.includes(searchTerm.toLowerCase())
-    const matchesDifficulty = !filters.difficulty.length || filters.difficulty.includes(prompt.Difficoltà)
-    const matchesSkills = !filters.skills.length || filters.skills.some(skill => prompt['Skill richieste']?.includes(skill))
-    const matchesEarnings = !filters.earnings.length || filters.earnings.includes(prompt['Guadagno mensile'])
-    const matchesTime = !filters.time.length || filters.time.includes(prompt.Tempo)
-    const matchesType = !filters.type.length || filters.type.includes(prompt['Tipo attività'])
-    return matchesSearch && matchesDifficulty && matchesSkills && matchesEarnings && matchesTime && matchesType
-  })
+  const filteredPrompts = useMemo(() => prompts.filter(prompt => {
+    const text = `${prompt.title} ${prompt.effectivePrompt} ${prompt.skills} ${prompt.type}`.toLowerCase()
+    return (!searchTerm || text.includes(searchTerm.toLowerCase())) &&
+      (!filters.difficulty.length || filters.difficulty.includes(prompt.difficulty)) &&
+      (!filters.skills.length || filters.skills.some(skill => prompt.skills.split(',').map(item => item.trim()).includes(skill))) &&
+      (!filters.earnings.length || filters.earnings.includes(prompt.earnings)) &&
+      (!filters.time.length || filters.time.includes(prompt.time)) &&
+      (!filters.type.length || filters.type.includes(prompt.type))
+  }), [prompts, searchTerm, filters])
+
+  const selectPath = difficulty => {
+    setFilters(current => ({ ...current, difficulty: [difficulty] }))
+    document.getElementById('prompt-list')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
   const handlePromptClick = prompt => {
     setSelectedPrompt(prompt)
     const viewed = JSON.parse(localStorage.getItem('viewedPrompts') || '[]')
-    if (!viewed.includes(prompt['#'])) {
-      const updated = [...viewed, prompt['#']]
+    if (!viewed.includes(prompt.id)) {
+      const updated = [...viewed, prompt.id]
       localStorage.setItem('viewedPrompts', JSON.stringify(updated))
       setViewedCount(updated.length)
     }
@@ -77,7 +93,7 @@ function App() {
   return <div className="app">
     <Header darkMode={darkMode} toggleDarkMode={() => setDarkMode(value => !value)} />
     <Hero />
-    <LearningPath />
+    <LearningPath onSelectPath={selectPath} />
     <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
     <FilterBar filters={filters} setFilters={setFilters} prompts={prompts} />
     <PromptList prompts={filteredPrompts} onPromptClick={handlePromptClick} viewedCount={viewedCount} totalCount={prompts.length} />
