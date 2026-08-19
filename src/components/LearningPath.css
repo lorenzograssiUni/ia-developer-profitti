@@ -1,0 +1,138 @@
+.learning-path {
+  margin-bottom: 40px;
+}
+
+.learning-path h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+body.dark-mode .learning-path h2 {
+  color: #e8e9ea;
+}
+
+.paths-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.path-card {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 25px;
+  transition: all 0.3s ease;
+}
+
+body.dark-mode .path-card {
+  background: #1a1a2e;
+  border-color: #2a2a3e;
+}
+
+.path-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  border-color: #4a90e2;
+}
+
+.path-icon {
+  color: #4a90e2;
+  margin-bottom: 15px;
+}
+
+.path-card h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 10px;
+}
+
+body.dark-mode .path-card h3 {
+  color: #e8e9ea;
+}
+
+.path-card p {
+  color: #4a5568;
+  margin-bottom: 15px;
+  line-height: 1.6;
+}
+
+body.dark-mode .path-card p {
+  color: #b0b8c8;
+}
+
+.path-stats {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.stat {
+  flex: 1;
+  background: #f0f4ff;
+  padding: 10px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+body.dark-mode .stat {
+  background: #2a2a3e;
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.75rem;
+  color: #718096;
+  margin-bottom: 4px;
+}
+
+body.dark-mode .stat-label {
+  color: #9ca3af;
+}
+
+.stat-value {
+  display: block;
+  font-weight: 600;
+  color: #1a1a2e;
+  font-size: 0.9rem;
+}
+
+body.dark-mode .stat-value {
+  color: #e8e9ea;
+}
+
+.stat-value.earnings {
+  color: #48bb78;
+}
+
+.path-skills {
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+body.dark-mode .path-skills {
+  background: #0f0f1a;
+}
+
+.skills-label {
+  font-weight: 600;
+  color: #4a5568;
+  display: block;
+  margin-bottom: 4px;
+}
+
+body.dark-mode .skills-label {
+  color: #b0b8c8;
+}
+
+@media (max-width: 768px) {
+  .paths-grid {
+    grid-template-columns: 1fr;
+  }
+}

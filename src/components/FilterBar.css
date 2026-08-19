@@ -1,0 +1,132 @@
+.filter-bar {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.filter-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #4a5568;
+  transition: all 0.2s ease;
+}
+
+body.dark-mode .filter-toggle {
+  background: #1a1a2e;
+  border-color: #2a2a3e;
+  color: #b0b8c8;
+}
+
+.filter-toggle:hover {
+  border-color: #4a90e2;
+}
+
+.filter-count {
+  background: #4a90e2;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.filter-content {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+body.dark-mode .filter-content {
+  background: #1a1a2e;
+  border-color: #2a2a3e;
+}
+
+.filter-section h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 12px;
+}
+
+body.dark-mode .filter-section h4 {
+  color: #e8e9ea;
+}
+
+.filter-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filter-options.skills {
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.filter-option {
+  background: #f0f4ff;
+  border: 1px solid #d0e1ff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: #4a5568;
+  transition: all 0.2s ease;
+}
+
+body.dark-mode .filter-option {
+  background: #2a2a3e;
+  border-color: #3a3a4e;
+  color: #b0b8c8;
+}
+
+.filter-option:hover {
+  border-color: #4a90e2;
+}
+
+.filter-option.active {
+  background: #4a90e2;
+  border-color: #4a90e2;
+  color: white;
+}
+
+.filter-option.skill.active {
+  background: #48bb78;
+  border-color: #48bb78;
+}
+
+.clear-filters {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fed7d7;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  color: #c53030;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.clear-filters:hover {
+  background: #feb2b2;
+}
+
+@media (max-width: 768px) {
+  .filter-content {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,144 @@
+.prompt-card {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+body.dark-mode .prompt-card {
+  background: #1a1a2e;
+  border-color: #2a2a3e;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.prompt-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  border-color: #4a90e2;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.prompt-number {
+  background: #4a90e2;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.copy-btn {
+  background: #f0f4ff;
+  border: none;
+  padding: 8px;
+  border-radius: 6px;
+  color: #4a90e2;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+body.dark-mode .copy-btn {
+  background: #2a2a3e;
+  color: #6ab0ff;
+}
+
+.copy-btn:hover {
+  background: #4a90e2;
+  color: white;
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 15px;
+  line-height: 1.4;
+}
+
+body.dark-mode .card-title {
+  color: #e8e9ea;
+}
+
+.card-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+}
+
+.badge.earnings {
+  background: #48bb78;
+}
+
+.badge.time {
+  background: #ed8936;
+}
+
+.skills-container {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+.skill-badge {
+  background: #f0f4ff;
+  color: #4a5568;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  border: 1px solid #d0e1ff;
+}
+
+body.dark-mode .skill-badge {
+  background: #2a2a3e;
+  color: #b0b8c8;
+  border-color: #3a3a4e;
+}
+
+.read-more-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #4a90e2;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  width: 100%;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.read-more-btn:hover {
+  background: #357abd;
+}
+
+@media (max-width: 768px) {
+  .prompt-card {
+    padding: 16px;
+  }
+}
