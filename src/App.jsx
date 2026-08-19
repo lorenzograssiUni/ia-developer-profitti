@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import Papa from 'papaparse'
+import csvUrl from './data/-Prompt-Perchfaperte.csv?url'
 import Header from './components/Header'
 import Hero from './components/Hero'
 import SearchBar from './components/SearchBar'
@@ -10,7 +11,11 @@ import LearningPath from './components/LearningPath'
 import FAQ from './components/FAQ'
 import './styles/App.css'
 
-const pick = (row, ...keys) => keys.map(key => row[key]).find(value => value?.trim?.()) || ''
+const normalizeKey = value => String(value || '').replace(/^\uFEFF/, '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/gi, '').toLowerCase()
+const readColumn = (row, ...names) => {
+  const normalized = Object.fromEntries(Object.entries(row).map(([key, value]) => [normalizeKey(key), String(value || '').trim()]))
+  return names.map(normalizeKey).map(key => normalized[key]).find(Boolean) || ''
+}
 
 function App() {
   const [prompts, setPrompts] = useState([])
@@ -23,8 +28,7 @@ function App() {
   const [viewedCount, setViewedCount] = useState(0)
 
   useEffect(() => {
-    const savedDarkMode = localStorage.getItem('darkMode') === 'true'
-    setDarkMode(savedDarkMode)
+    setDarkMode(localStorage.getItem('darkMode') === 'true')
     setViewedCount(JSON.parse(localStorage.getItem('viewedPrompts') || '[]').length)
   }, [])
 
@@ -34,7 +38,7 @@ function App() {
   }, [darkMode])
 
   useEffect(() => {
-    fetch('/data/prompts.csv')
+    fetch(csvUrl)
       .then(response => {
         if (!response.ok) throw new Error('File CSV non disponibile')
         return response.text()
@@ -42,14 +46,14 @@ function App() {
       .then(text => {
         const parsed = Papa.parse(text, { header: true, skipEmptyLines: true })
         const normalized = parsed.data.map(row => ({
-          id: pick(row, '#', 'Numero', 'ID'),
-          title: pick(row, 'Titolo', 'Prompt'),
-          difficulty: pick(row, 'Difficoltà°°', 'Difficoltà', 'Difficolta'),
-          skills: pick(row, 'Skill richieste', 'Skill'),
-          earnings: pick(row, 'Guadagno mensile', 'Guadagno'),
-          time: pick(row, 'Tempo', 'Tempo stimato'),
-          type: pick(row, 'Tipo attività', 'Tipo attivita', 'Tipo'),
-          effectivePrompt: pick(row, 'Prompt Effettivo', 'Prompt effettivo', 'Prompt'),
+          id: readColumn(row, '#', 'numero', 'id'),
+          title: readColumn(row, 'titolo'),
+          difficulty: readColumn(row, 'difficoltà°°', 'difficoltà', 'difficolta'),
+          skills: readColumn(row, 'skill richieste', 'skill'),
+          earnings: readColumn(row, 'guadagno mensile', 'guadagno'),
+          time: readColumn(row, 'tempo', 'tempo stimato'),
+          type: readColumn(row, 'tipo attività', 'tipo attivita', 'tipo'),
+          effectivePrompt: readColumn(row, 'prompt effettivo'),
           raw: row
         })).filter(item => item.id && item.title)
         if (!normalized.length) throw new Error('Nessun prompt valido nel CSV')
@@ -63,10 +67,11 @@ function App() {
   }, [])
 
   const filteredPrompts = useMemo(() => prompts.filter(prompt => {
-    const text = `${prompt.title} ${prompt.effectivePrompt} ${prompt.skills} ${prompt.type}`.toLowerCase()
-    return (!searchTerm || text.includes(searchTerm.toLowerCase())) &&
+    const content = `${prompt.title} ${prompt.effectivePrompt} ${prompt.skills} ${prompt.type}`.toLowerCase()
+    const selectedSkills = prompt.skills.split(',').map(item => item.trim())
+    return (!searchTerm || content.includes(searchTerm.toLowerCase())) &&
       (!filters.difficulty.length || filters.difficulty.includes(prompt.difficulty)) &&
-      (!filters.skills.length || filters.skills.some(skill => prompt.skills.split(',').map(item => item.trim()).includes(skill))) &&
+      (!filters.skills.length || filters.skills.some(skill => selectedSkills.includes(skill))) &&
       (!filters.earnings.length || filters.earnings.includes(prompt.earnings)) &&
       (!filters.time.length || filters.time.includes(prompt.time)) &&
       (!filters.type.length || filters.type.includes(prompt.type))
