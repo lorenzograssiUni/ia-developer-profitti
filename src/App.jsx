@@ -13,14 +13,9 @@ import './styles/App.css'
 function App() {
   const [prompts, setPrompts] = useState([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
-  const [filters, setFilters] = useState({
-    difficulty: [],
-    skills: [],
-    earnings: [],
-    time: [],
-    type: []
-  })
+  const [filters, setFilters] = useState({ difficulty: [], skills: [], earnings: [], time: [], type: [] })
   const [selectedPrompt, setSelectedPrompt] = useState(null)
   const [darkMode, setDarkMode] = useState(false)
   const [viewedCount, setViewedCount] = useState(0)
@@ -28,106 +23,67 @@ function App() {
   useEffect(() => {
     const savedDarkMode = localStorage.getItem('darkMode') === 'true'
     setDarkMode(savedDarkMode)
-    if (savedDarkMode) {
-      document.body.classList.add('dark-mode')
-    }
+    setViewedCount(JSON.parse(localStorage.getItem('viewedPrompts') || '[]').length)
   }, [])
 
   useEffect(() => {
     localStorage.setItem('darkMode', darkMode)
-    if (darkMode) {
-      document.body.classList.add('dark-mode')
-    } else {
-      document.body.classList.remove('dark-mode')
-    }
+    document.body.classList.toggle('dark-mode', darkMode)
   }, [darkMode])
 
   useEffect(() => {
-    fetch('/src/data/prompts-demo.csv')
-      .then(res => res.text())
+    fetch('/data/prompts.csv')
+      .then(response => {
+        if (!response.ok) throw new Error('Il file dei prompt non è disponibile.')
+        return response.text()
+      })
       .then(csvText => {
-        const parsed = Papa.parse(csvText, { header: true })
-        const data = parsed.data.filter(row => row['#'] && row['#'].trim() !== '')
+        const result = Papa.parse(csvText, { header: true, skipEmptyLines: true })
+        const data = result.data.filter(row => row['#'] && row.Prompt)
+        if (!data.length) throw new Error('Il file non contiene prompt validi.')
         setPrompts(data)
-        setLoading(false)
       })
-      .catch(err => {
-        console.error('Errore caricamento CSV:', err)
-        setLoading(false)
+      .catch(error => {
+        console.error('Errore caricamento CSV:', error)
+        setLoadError('Non siamo riusciti a caricare i prompt. Ricarica la pagina tra qualche istante.')
       })
+      .finally(() => setLoading(false))
   }, [])
 
   const filteredPrompts = prompts.filter(prompt => {
-    const searchLower = searchTerm.toLowerCase()
-    const matchesSearch = !searchTerm || 
-      prompt['Prompt'].toLowerCase().includes(searchLower) ||
-      (prompt['Perché·¢fa per te'] && prompt['Perché·¢fa per te'].toLowerCase().includes(searchLower))
-
-    const matchesDifficulty = filters.difficulty.length === 0 || 
-      filters.difficulty.includes(prompt['Difficoltà·¢'])
-    
-    const matchesSkills = filters.skills.length === 0 || 
-      filters.skills.some(skill => prompt['Skill richieste']?.includes(skill))
-    
-    const matchesEarnings = filters.earnings.length === 0 || 
-      filters.earnings.includes(prompt['Guadagno mensile'])
-    
-    const matchesTime = filters.time.length === 0 || 
-      filters.time.includes(prompt['Tempo'])
-    
-    const matchesType = filters.type.length === 0 || 
-      filters.type.includes(prompt['Tipo attività'])
-
+    const text = `${prompt.Prompt || ''} ${prompt['Perché fa per te'] || ''}`.toLowerCase()
+    const matchesSearch = !searchTerm || text.includes(searchTerm.toLowerCase())
+    const matchesDifficulty = !filters.difficulty.length || filters.difficulty.includes(prompt.Difficoltà)
+    const matchesSkills = !filters.skills.length || filters.skills.some(skill => prompt['Skill richieste']?.includes(skill))
+    const matchesEarnings = !filters.earnings.length || filters.earnings.includes(prompt['Guadagno mensile'])
+    const matchesTime = !filters.time.length || filters.time.includes(prompt.Tempo)
+    const matchesType = !filters.type.length || filters.type.includes(prompt['Tipo attività'])
     return matchesSearch && matchesDifficulty && matchesSkills && matchesEarnings && matchesTime && matchesType
   })
 
-  const handlePromptClick = (prompt) => {
+  const handlePromptClick = prompt => {
     setSelectedPrompt(prompt)
-    setViewedCount(prev => {
-      const viewed = JSON.parse(localStorage.getItem('viewedPrompts') || '[]')
-      if (!viewed.includes(prompt['#'])) {
-        viewed.push(prompt['#'])
-        localStorage.setItem('viewedPrompts', JSON.stringify(viewed))
-      }
-      return viewed.length
-    })
+    const viewed = JSON.parse(localStorage.getItem('viewedPrompts') || '[]')
+    if (!viewed.includes(prompt['#'])) {
+      const updated = [...viewed, prompt['#']]
+      localStorage.setItem('viewedPrompts', JSON.stringify(updated))
+      setViewedCount(updated.length)
+    }
   }
 
-  const toggleDarkMode = () => {
-    setDarkMode(prev => !prev)
-  }
+  if (loading) return <div className="loading-container"><div className="loading-spinner" /><p>Caricamento dei percorsi in corso...</p></div>
+  if (loadError) return <div className="loading-container"><p>{loadError}</p></div>
 
-  if (loading) {
-    return (
-      <div className="loading-container">
-        <div className="loading-spinner"></div>
-        <p>Caricamento prompt in corso...</p>
-      </div>
-    )
-  }
-
-  return (
-    <div className="app">
-      <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-      <Hero />
-      <LearningPath />
-      <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-      <FilterBar filters={filters} setFilters={setFilters} prompts={prompts} />
-      <PromptList 
-        prompts={filteredPrompts} 
-        onPromptClick={handlePromptClick}
-        viewedCount={viewedCount}
-        totalCount={prompts.length}
-      />
-      <FAQ />
-      {selectedPrompt && (
-        <PromptModal 
-          prompt={selectedPrompt} 
-          onClose={() => setSelectedPrompt(null)} 
-        />
-      )}
-    </div>
-  )
+  return <div className="app">
+    <Header darkMode={darkMode} toggleDarkMode={() => setDarkMode(value => !value)} />
+    <Hero />
+    <LearningPath />
+    <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+    <FilterBar filters={filters} setFilters={setFilters} prompts={prompts} />
+    <PromptList prompts={filteredPrompts} onPromptClick={handlePromptClick} viewedCount={viewedCount} totalCount={prompts.length} />
+    <FAQ />
+    {selectedPrompt && <PromptModal prompt={selectedPrompt} onClose={() => setSelectedPrompt(null)} />}
+  </div>
 }
 
 export default App
